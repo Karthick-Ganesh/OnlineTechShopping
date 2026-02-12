@@ -4,15 +4,13 @@ import { useUser } from './UserContext';
 import LoginPage from './LoginPage';
 
 const App = () => {
-  // --- AUTH ---
   const { currentUser, logout } = useUser();
 
-  // --- STATE MANAGEMENT ---
+
   const [cart, setCart] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // --- LOAD CART FROM LOCALSTORAGE WHEN USER LOGS IN ---
   useEffect(() => {
     if (currentUser) {
       const users = JSON.parse(localStorage.getItem('shopUsers') || '{}');
@@ -24,7 +22,6 @@ const App = () => {
     }
   }, [currentUser]);
 
-  // --- SAVE CART TO LOCALSTORAGE WHENEVER IT CHANGES ---
   useEffect(() => {
     if (currentUser) {
       const users = JSON.parse(localStorage.getItem('shopUsers') || '{}');
@@ -35,12 +32,10 @@ const App = () => {
     }
   }, [cart, currentUser]);
 
-  // --- IF NOT LOGGED IN, SHOW LOGIN PAGE ---
   if (!currentUser) {
     return <LoginPage />;
   }
 
-  // --- MOCK DATA ---
   const products = [
     { 
       id: 1, 
@@ -220,39 +215,31 @@ const App = () => {
     },
   ];
 
-  // --- Hand-picked products that get the "BEST DEAL" badge ---
   const bestDealIds = [1, 7, 12, 18, 24, 26];
 
-  // --- FUNCTIONS & LOGIC ---
-
-  // 1. Search Filter Logic
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // 2. Add Item to Cart
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
-  // 3. Remove Item from Cart
   const removeFromCart = (indexToRemove) => {
     const newCart = cart.filter((_, index) => index !== indexToRemove);
     setCart(newCart);
   };
 
-  // 4. Calculate Total Price
   const cartTotal = cart.reduce((total, item) => total + item.price, 0);
 
-  // 5. Checkout Handler
   const handleCheckout = () => {
     if (cart.length === 0) {
       alert("Your cart is empty! Add some items first.");
       return;
     }
     alert(`Checkout Successful! Total: $${cartTotal}. Thank you for shopping.`);
-    setCart([]); // Clear the cart
-    setIsCartOpen(false); // Close the modal
+    setCart([]);
+    setIsCartOpen(false);
   };
 
   return (
@@ -298,10 +285,8 @@ const App = () => {
       <main className="product-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => {
-            // Check if this product is in the hand-picked best deals list
             const isBestDeal = bestDealIds.includes(product.id);
 
-            // Calculate bar heights relative to THIS product's own price range
             const maxPrice = Math.max(...product.history);
             const minPrice = Math.min(...product.history);
             const priceRange = maxPrice - minPrice;
@@ -322,9 +307,8 @@ const App = () => {
                   <div className="price-chart-container">
                     <div className="chart-bars">
                       {product.history.map((pricePoint, index) => {
-                        // Scale each bar between 15% (min visible) and 100% (tallest)
                         const barHeight = priceRange === 0 
-                          ? 50 // If all prices are the same, show equal bars
+                          ? 50
                           : 15 + ((pricePoint - minPrice) / priceRange) * 85;
                         
                         return (
